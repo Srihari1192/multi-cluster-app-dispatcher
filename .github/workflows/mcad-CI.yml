@@ -1,0 +1,37 @@
+# This workflow will build mcad and run unit test and E2E tests
+name: MCAD-CI
+on:
+  pull_request_target:
+    types: [ opened, labeled, unlabeled, synchronize ]
+    branches:
+      - 'main'
+
+jobs:
+  MCAD-CI:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18.10
+
+      - name: Build
+        run: make mcad-controller
+
+      - name: Run Unit tests
+        run: make run-test
+
+      - name: Build Image
+        run: |
+          make images
+
+      - name: Run E2E tests
+        run: |
+          make run-e2e
+          
