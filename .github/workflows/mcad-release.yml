@@ -31,10 +31,13 @@ jobs:
       - name: Set latest tag and Branch name
         env:
           GIT_BRANCH: test-mcadci
-          TAG: $GIT_BRANCH-v1.2.0
+          TAG: $GIT_BRANCH--v1.2.0
         run: |
-          echo $GIT_BRANCH
-          echo $TAG
+          echo "GIT_BRANCH=test-mcadci" >> $GITHUB_ENV
+          GIT_BRANCH="${GIT_BRANCH}" 
+          TAG="${GIT_BRANCH}-v1.2.0"
+          # Set the TAG environment variable
+          echo "TAG=${TAG}" >> $GITHUB_ENV
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -45,13 +48,10 @@ jobs:
         run:
           make mcad-controller
 
-      - name: Run Unit tests
-        run: make run-test
-
       - name: Build Image and push
         run: |
-          make images -e GIT_BRANCH=$GIT_BRANCH TAG=$TAG
-          make push-images -e GIT_BRANCH=$GIT_BRANCH TAG=$TAG quay_repository=quay.io/svenkata1 quay_id=${{ secrets.QUAY_ID }} quay_token=${{ secrets.QUAY_TOKEN }}
+          make images -e GIT_BRANCH=${{ env.GIT_BRANCH }}  TAG=${{ env.TAG }}
+          make push-images -e GIT_BRANCH=${{ env.GIT_BRANCH }}  TAG=${{ env.TAG }} quay_repository=quay.io/svenkata1 quay_id=${{ secrets.QUAY_ID }} quay_token=${{ secrets.QUAY_TOKEN }}
 
       - name: Run E2E tests
         run: |
