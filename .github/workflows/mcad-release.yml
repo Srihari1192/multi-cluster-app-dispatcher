@@ -29,12 +29,12 @@ jobs:
           fetch-depth: 0
 
       - name: Set latest tag and Branch name
+        env:
+          GIT_BRANCH=test-mcadci
+          TAG=v1.2.0
         run: |
-          echo "GIT_BRANCH=test-mcadci" >> $GITHUB_ENV
-          GIT_BRANCH="${GIT_BRANCH}" 
-          TAG=${{ env.GIT_BRANCH }}-v1.2.0
-          # Set the TAG environment variable
-          echo "TAG=${TAG}" >> $GITHUB_ENV
+          echo "BRanch: ${GIT_BRANCH}"
+          echo "Tag: ${TAG}"
 
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -47,8 +47,8 @@ jobs:
 
       - name: Build Image and push
         run: |
-          make images -e GIT_BRANCH=${{ env.GIT_BRANCH }}  TAG=${{ env.TAG }}
-          make push-images -e GIT_BRANCH="${{ env.GIT_BRANCH }}"  TAG="${{ env.TAG }}" quay_repository=quay.io/svenkata1 quay_id=${{ secrets.QUAY_ID }} quay_token=${{ secrets.QUAY_TOKEN }}
+          make images -e GIT_BRANCH=${{ env.GIT_BRANCH }}  TAG=${{ env.GIT_BRANCH }}-${{ env.TAG }}
+          make push-images -e GIT_BRANCH=${{ env.GIT_BRANCH }} TAG=${{ env.GIT_BRANCH }}-${{ env.TAG }} quay_repository=quay.io/svenkata1 quay_id=${{ secrets.QUAY_ID }} quay_token=${{ secrets.QUAY_TOKEN }}
 
       - name: Run E2E tests
         run: |
