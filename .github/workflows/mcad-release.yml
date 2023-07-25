@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "GIT_BRANCH=test-mcadci" >> $GITHUB_ENV
           GIT_BRANCH="${GIT_BRANCH}" 
-          TAG="${{ env.GIT_BRANCH }}-v1.2.0"
+          TAG=${{ env.GIT_BRANCH }}-v1.2.0
           # Set the TAG environment variable
           echo "TAG=${TAG}" >> $GITHUB_ENV
 
