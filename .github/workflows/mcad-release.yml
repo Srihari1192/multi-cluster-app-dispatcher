@@ -32,6 +32,9 @@ jobs:
         env:
           GIT_BRANCH: test-mcadci
           TAG: $GIT_BRANCH--v1.2.0
+        run:
+          echo "Branch  ${{ env.GIT_BRANCH }}
+          echo "Tag  ${{ env.TAG }}
 
       - name: Set up Go
         uses: actions/setup-go@v3
