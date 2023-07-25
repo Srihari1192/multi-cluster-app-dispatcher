@@ -31,7 +31,7 @@ jobs:
       - name: Set latest tag and Branch name
         run: |
           echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          echo "TAG=v1.2.0" >> $GITHUB_ENV
 
       - name: Set up Go
         uses: actions/setup-go@v3
