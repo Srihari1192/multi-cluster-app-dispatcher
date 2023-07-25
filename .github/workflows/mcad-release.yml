@@ -44,7 +44,7 @@ jobs:
 
       - name: Build Image and push
         run: |
-          make images -e GIT_BRANCH={{ env.BRANCH }}   TAG=${{ env.BRANCH }}-${{ env.TAG }}
+          make images -e GIT_BRANCH=${{ env.BRANCH }}   TAG=${{ env.BRANCH }}-${{ env.TAG }}
           make push-images -e GIT_BRANCH=${{ env.BRANCH }}   TAG=${{ env.BRANCH }}-${{ env.TAG }} quay_repository=quay.io/svenkata1 quay_id=${{ secrets.QUAY_ID }} quay_token=${{ secrets.QUAY_TOKEN }}
 
       - name: Run E2E tests
