@@ -49,4 +49,4 @@ jobs:
 
       - name: Run E2E tests
         run: |
-          make run-e2e -e GIT_BRANCH=$GIT_BRANCH TAG=$TAG
+          make run-e2e -e GIT_BRANCH=${{ env.BRANCH }}   TAG=${{ env.BRANCH }}-${{ env.TAG }}
