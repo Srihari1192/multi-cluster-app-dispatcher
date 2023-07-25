@@ -30,8 +30,11 @@ jobs:
 
       - name: Set latest tag and Branch name
         run: |
-          GIT_BRANCH=test-mcadci
-          TAG=$GIT_BRANCH-v1.2.0
+          echo "GIT_BRANCH=test-mcadci" >> $GITHUB_ENV
+          GIT_BRANCH="${GIT_BRANCH}" 
+          TAG="${GIT_BRANCH}-v1.2.0"
+          # Set the TAG environment variable
+          echo "TAG=${TAG}" >> $GITHUB_ENV
 
       - name: Set up Go
         uses: actions/setup-go@v3
