@@ -29,12 +29,9 @@ jobs:
           fetch-depth: 0
 
       - name: Set latest tag and Branch name
-        env:
-          GIT_BRANCH: test-mcadci
-          TAG: v1.2.0
         run: |
-          echo "BRanch: ${GIT_BRANCH}"
-          echo "Tag: ${TAG}"
+          echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Set up Go
         uses: actions/setup-go@v3
