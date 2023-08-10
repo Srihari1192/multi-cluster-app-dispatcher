@@ -1,4 +1,4 @@
-name: Build and Push
+name: Build and Push Image
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Set latest tag and Branch name 
+      - name: Set latest tag and Branch name
         run: |
           BRANCH=$(echo ${GITHUB_REF#refs/heads/})
           echo "GIT_BRANCH=$(echo "$BRANCH" | sed 's/[^A-Za-z0-9._-]/-/g' )" >> $GITHUB_ENV
