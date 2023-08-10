@@ -172,10 +172,10 @@ else
 	docker tag mcad-controller:${TAG}  ${quay_repository}/test-mcad:${TAG}
 	$(info Push the docker image to registry)
 	docker push ${quay_repository}/test-mcad:${TAG}
-ifeq ($(strip $(git_repository_id)),main)
+ifeq ($(strip $(git_repository_id)),test-build-push-559)
 	$(info Update the `latest` tag when built from `main`)
-	docker tag mcad-controller:${TAG}  ${quay_repository}/test-mcad:latest
-	docker push ${quay_repository}/test-mcad:latest
+	docker tag mcad-controller:${TAG}  ${quay_repository}/test-mcad:dev
+	docker push ${quay_repository}/test-mcad:dev
 endif
 ifneq ($(TAG:release-v%=%),$(TAG))
 	$(info Update the `stable` tag to point `latest` release image)
