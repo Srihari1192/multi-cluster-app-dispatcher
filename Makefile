@@ -169,17 +169,17 @@ else
 	$(info Log into quay)
 	docker login quay.io -u ${quay_id} --password ${quay_token}
 	$(info Tag the latest image)
-	docker tag mcad-controller:${TAG}  ${quay_repository}/mcad-controller:${TAG}
+	docker tag mcad-controller:${TAG}  ${quay_repository}/test-mcad:${TAG}
 	$(info Push the docker image to registry)
-	docker push ${quay_repository}/mcad-controller:${TAG}
+	docker push ${quay_repository}/test-mcad:${TAG}
 ifeq ($(strip $(git_repository_id)),main)
 	$(info Update the `latest` tag when built from `main`)
-	docker tag mcad-controller:${TAG}  ${quay_repository}/mcad-controller:latest
-	docker push ${quay_repository}/mcad-controller:latest
+	docker tag mcad-controller:${TAG}  ${quay_repository}/test-mcad:latest
+	docker push ${quay_repository}/test-mcad:latest
 endif
 ifneq ($(TAG:release-v%=%),$(TAG))
 	$(info Update the `stable` tag to point `latest` release image)
-	docker tag mcad-controller:${TAG} ${quay_repository}/mcad-controller:stable
+	docker tag mcad-controller:${TAG} ${quay_repository}/test-mcad:stable
 	docker push ${quay_repository}/mcad-controller:stable
 endif
 endif
@@ -193,8 +193,8 @@ ifeq ($(strip $(quay_repository)),)
 	echo "Running e2e with MCAD local image: mcad-controller ${TAG} IfNotPresent."
 	hack/run-e2e-kind.sh mcad-controller ${TAG} IfNotPresent
 else
-	echo "Running e2e with MCAD registry image image: ${quay_repository}/mcad-controller ${TAG}."
-	hack/run-e2e-kind.sh ${quay_repository}/mcad-controller ${TAG}
+	echo "Running e2e with MCAD registry image image: ${quay_repository}/test-mcad ${TAG}."
+	hack/run-e2e-kind.sh ${quay_repository}/test-mcad ${TAG}
 endif
 
 coverage:
