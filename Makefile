@@ -3,6 +3,7 @@ CAT_CMD=$(if $(filter $(OS),Windows_NT),type,cat)
 RELEASE_VER:=
 CURRENT_DIR=$(shell pwd)
 GIT_BRANCH:=$(shell git symbolic-ref --short HEAD 2>&1 | grep -v fatal)
+TAG:=
 #define the GO_BUILD_ARGS if you need to pass additional arguments to the go build
 GO_BUILD_ARGS?=
 
@@ -21,26 +22,6 @@ APPLYCONFIGURATION_GEN ?= $(LOCALBIN)/applyconfiguration-gen
 CLIENT_GEN ?= $(LOCALBIN)/client-gen
 LISTER_GEN ?= $(LOCALBIN)/lister-gen
 INFORMER_GEN ?= $(LOCALBIN)/informer-gen
-
-# Reset branch name if this a Travis CI environment
-ifneq ($(strip $(TRAVIS_BRANCH)),)
-	GIT_BRANCH:=${TRAVIS_BRANCH}
-endif
-
-TAG:=$(shell echo "")
-# Check for git repository id sent by Travis-CI
-ifneq ($(strip $(git_repository_id)),)
-	TAG:=${TAG}${git_repository_id}-
-endif
-
-# Check for current branch name and update 'RELEASE_VER' and 'TAG'
-ifneq ($(strip $(GIT_BRANCH)),)
-	RELEASE_VER:= $(shell git describe --tags --abbrev=0)
-	TAG:=${TAG}${GIT_BRANCH}
-	# replace invalid characters that might exist in the branch name
-	TAG:=$(shell echo ${TAG} | sed 's/[^a-zA-Z0-9]/-/g')
-	TAG:=${TAG}-${RELEASE_VER}
-endif
 
 .PHONY: print-global-variables
 
@@ -184,7 +165,6 @@ push-images: verify-tag-name
 ifeq ($(strip $(quay_repository)),)
 	$(info No registry information provided.  To push images to a docker registry please set)
 	$(info environment variables: quay_repository, quay_token, and quay_id.  Environment)
-	$(info variables do not need to be set for github Travis CICD.)
 else
 	$(info Log into quay)
 	docker login quay.io -u ${quay_id} --password ${quay_token}
