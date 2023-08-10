@@ -1,6 +1,6 @@
 BIN_DIR=_output/bin
 CAT_CMD=$(if $(filter $(OS),Windows_NT),type,cat)
-RELEASE_VER:=
+RELEASE_VER:=$(shell git describe --tags --abbrev=0)
 CURRENT_DIR=$(shell pwd)
 GIT_BRANCH:=$(shell git symbolic-ref --short HEAD 2>&1 | grep -v fatal)
 TAG:=
