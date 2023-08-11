@@ -3,7 +3,7 @@ CAT_CMD=$(if $(filter $(OS),Windows_NT),type,cat)
 RELEASE_VER:=$(shell git describe --tags --abbrev=0)
 CURRENT_DIR=$(shell pwd)
 GIT_BRANCH:=$(shell git symbolic-ref --short HEAD 2>&1 | grep -v fatal)
-TAG:=
+
 #define the GO_BUILD_ARGS if you need to pass additional arguments to the go build
 GO_BUILD_ARGS?=
 
@@ -22,6 +22,17 @@ APPLYCONFIGURATION_GEN ?= $(LOCALBIN)/applyconfiguration-gen
 CLIENT_GEN ?= $(LOCALBIN)/client-gen
 LISTER_GEN ?= $(LOCALBIN)/lister-gen
 INFORMER_GEN ?= $(LOCALBIN)/informer-gen
+
+TAG:=$(shell echo "")
+
+# Check for current branch name and update 'RELEASE_VER' and 'TAG'
+ifneq ($(strip $(GIT_BRANCH)),)
+	RELEASE_VER:= $(shell git describe --tags --abbrev=0)
+	TAG:=${TAG}${GIT_BRANCH}
+	# replace invalid characters that might exist in the branch name
+	TAG:=$(shell echo ${TAG} | sed 's/[^a-zA-Z0-9]/-/g')
+	TAG:=${TAG}-${RELEASE_VER}
+endif
 
 .PHONY: print-global-variables
 
@@ -174,8 +185,8 @@ else
 	docker push ${quay_repository}/test-mcad:${TAG}
 ifeq ($(strip $(git_repository_id)),test-build-push-559)
 	$(info Update the `latest` tag when built from `main`)
-	docker tag mcad-controller:${TAG}  ${quay_repository}/test-mcad:dev
-	docker push ${quay_repository}/test-mcad:dev
+	docker tag mcad-controller:${TAG}  ${quay_repository}/test-mcad:latest
+	docker push ${quay_repository}/test-mcad:latest
 endif
 ifneq ($(TAG:release-v%=%),$(TAG))
 	$(info Update the `stable` tag to point `latest` release image)
