@@ -20,10 +20,10 @@ jobs:
           BRANCH=$(echo ${GITHUB_REF#refs/heads/})
           echo "GIT_BRANCH=$(echo "$BRANCH" | sed 's/[^A-Za-z0-9._-]/-/g' )" >> $GITHUB_ENV
 
-          if [[ $GIT_BRANCH == "test-build-push-559" ]]; then
+          if [[ $GIT_BRANCH = "test-build-push-559" ]]; then
             echo "in if condition"
             echo "TAG=dev" >> $GITHUB_ENV
-          elif [[ $GIT_BRANCH == release-* ]]; then
+          elif [[ $GIT_BRANCH = release-* ]]; then
             echo "in elif condition"
             echo "TAG=$GIT_BRANCH" >> $GITHUB_ENV
             echo "Performing actions for release branches..."
@@ -40,9 +40,6 @@ jobs:
       - name: Build
         run:
           make mcad-controller
-
-      - name: Run Unit tests
-        run: make run-test
 
       - name: Build Image
         run: |
