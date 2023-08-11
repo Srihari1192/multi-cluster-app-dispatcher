@@ -23,7 +23,7 @@ jobs:
           if [[ "$BRANCH" == "main" ]]; then
             echo "in if condition"
             echo "TAG=dev" >> $GITHUB_ENV
-          elif [[ "$BRANCH" == release-* ]]; then
+          elif [[ "$BRANCH" == test-* ]]; then
             echo "in elif condition"
             echo "TAG=$BRANCH" >> $GITHUB_ENV
             echo "Performing actions for release branches..."
