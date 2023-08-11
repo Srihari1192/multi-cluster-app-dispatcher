@@ -19,7 +19,10 @@ jobs:
         run: |
           BRANCH=$(echo ${GITHUB_REF#refs/heads/})
           echo "GIT_BRANCH=$(echo "$BRANCH" | sed 's/[^A-Za-z0-9._-]/-/g' )" >> $GITHUB_ENV
-          echo "TAG=dev" >> $GITHUB_ENV
+          if [ "$GIT_BRANCH" = "test-build-push-559" ]; then
+             echo "TAG=dev" >> $GITHUB_ENV
+          else
+            echo "TAG=$(git describe --abbrev=0 --tags)" >> $GITHUB_ENV
 
       - name: Set up Go
         uses: actions/setup-go@v3
