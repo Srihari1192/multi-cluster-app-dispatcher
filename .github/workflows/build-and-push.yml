@@ -20,12 +20,12 @@ jobs:
           BRANCH=$(echo ${GITHUB_REF#refs/heads/})
           echo "GIT_BRANCH=$(echo "$BRANCH" | sed 's/[^A-Za-z0-9._-]/-/g' )" >> $GITHUB_ENV
 
-          if [[ $GIT_BRANCH = "test-build-push-559" ]]; then
+          if [[ "$BRANCH" == "test-build-push-559" ]]; then
             echo "in if condition"
             echo "TAG=dev" >> $GITHUB_ENV
-          elif [[ $GIT_BRANCH = release-* ]]; then
+          elif [[ "$BRANCH" == release-* ]]; then
             echo "in elif condition"
-            echo "TAG=$GIT_BRANCH" >> $GITHUB_ENV
+            echo "TAG=$BRANCH" >> $GITHUB_ENV
             echo "Performing actions for release branches..."
           else
             echo "in else condition"
