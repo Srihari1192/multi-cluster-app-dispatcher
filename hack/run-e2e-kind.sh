@@ -66,6 +66,12 @@ function update_test_host {
       echo "kubectl was sucessfully installed."    
   fi    
   
+  # Check if curl is available
+  if ! command -v curl &> /dev/null; then
+    echo "Error: curl command is not available."
+    exit 1
+  fi
+
   which kind >/dev/null 2>&1
   if [ $? -ne 0 ] 
   then
