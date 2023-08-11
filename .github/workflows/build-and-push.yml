@@ -19,7 +19,7 @@ jobs:
         run: |
           BRANCH=$(echo ${GITHUB_REF#refs/heads/})
           echo "GIT_BRANCH=$(echo "$BRANCH" | sed 's/[^A-Za-z0-9._-]/-/g' )" >> $GITHUB_ENV
-          if [[ "$GIT_BRANCH"="test-build-push-559" ]]; then
+          if [[ "$GIT_BRANCH" == "test-build-push-559" ]]; then
              echo "TAG=dev" >> $GITHUB_ENV
           elif [[ "$GIT_BRANCH" == release-* ]]; then
             echo "TAG=$GIT_BRANCH" >> $GITHUB_ENV
