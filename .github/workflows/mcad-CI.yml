@@ -1,10 +1,12 @@
 # This workflow will build mcad and run unit test and E2E tests
 name: MCAD-CI
 on:
-  pull_request:
-    branches:
-      - 'main'
-      - 'release-*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag'
+        required: true
+        default: 'v0.0.0-dev
 
 jobs:
   MCAD-CI:
@@ -20,8 +22,8 @@ jobs:
       - name: Set latest tag and Branch name
         run: |
           BRANCH=${{ github.event.pull_request.head.ref }}
-          echo "GIT_BRANCH=$(echo "$BRANCH" | sed 's/[^A-Za-z0-9._-]/-/g' )" >> $GITHUB_ENV
-          echo "TAG=$(git describe --abbrev=0 --tags)" >> $GITHUB_ENV
+          echo "GIT_BRANCH=test-build-push-559 >> $GITHUB_ENV
+          echo "TAG=v1.32.0" >> $GITHUB_ENV
 
       - name: Set up Go
         uses: actions/setup-go@v3
