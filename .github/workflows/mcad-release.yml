@@ -27,7 +27,7 @@ jobs:
 
       - name: Set latest tag and Branch name
         run: |
-          echo "GIT_BRANCH=test-build-push-559 >> $GITHUB_ENV
+          echo "GIT_BRANCH=test-build-push-559" >> $GITHUB_ENV
           echo "TAG=v1.32.0" >> $GITHUB_ENV
 
       - name: Set up Go
