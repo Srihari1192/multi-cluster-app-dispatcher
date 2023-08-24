@@ -466,10 +466,13 @@ setup-mcad-env
 # MCAD with quotamanagement options is started by kuttl-tests
 kuttl-tests
 mcad-up
+echo "Running End to end test with -ginkgo.failFast"
 go test ./test/e2e -v -timeout 130m -count=1 -ginkgo.failFast
+echo "after Running End to end test with -ginkgo.failFast"
 RC=$?
 if [ ${RC} -eq 0 ]
 then
+  echo "in If before dump_logs set false"
   DUMP_LOGS="false"
 fi
 echo "End to end test script return code set to ${RC}"
