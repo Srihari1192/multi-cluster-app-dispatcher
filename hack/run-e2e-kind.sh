@@ -467,7 +467,7 @@ setup-mcad-env
 #kuttl-tests
 mcad-up
 
-go test ./test/e2e -v -timeout 130m -count=1 --failFast
+go test ./test/e2e -v -timeout 130m -count=1 -ginkgo.failFast
 
 if [ $? -ne 0 ]; then
   echo "Tests failed!"
