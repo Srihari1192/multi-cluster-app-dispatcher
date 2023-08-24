@@ -37,16 +37,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func RunSpecsWithSkipOnFailure(t *testing.T, description string, specDefs ...GinkgoBaseSuite) {
-	RegisterFailHandler(func(message string, callerSkip ...int) {
-		t.Skip("Skipping tests due to previous failure")
-	})
-
-	RunSpecs(t, description, specDefs...)
-}
+var hasFailed = false
 
 func TestE2E(t *testing.T) {
+	if hasFailed {
+		return
+	}
 	RegisterFailHandler(Fail)
-	//RunSpecs(t, "MCAD Test Suite")
-	RunSpecsWithSkipOnFailure(t, "MCAD Test Suite")
+	RunSpecs(t, "MCAD Test Suite")
+	//RunSpecsWithSkipOnFailure(t, "MCAD Test Suite")
 }

@@ -15,7 +15,7 @@ Follow the [build instructions here](./doc/build/build.md) to build the Multi-Cl
 Refer to [deployment instructions here](./doc/deploy/deployment.md) on how to deploy the `multi-cluster-app-dispatcher` as a controller in Kubernetes.
 
 
-## Release Process
+## Release Process test
 
 1. Run the [mcad-release.yml](https://github.com/project-codeflare/actions/workflows/mcad-release.yml) action under `Actions` by entering the new release version in the `Release tag` input field and click `Run workflow`.
    ![mcad-release](doc/images/mcad-release.png)
