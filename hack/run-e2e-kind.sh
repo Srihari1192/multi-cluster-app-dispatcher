@@ -467,12 +467,11 @@ setup-mcad-env
 #kuttl-tests
 mcad-up
 go test ./test/e2e -v -timeout 130m -count=1
-if [ $? -ne 0 ]; then
-  echo "Some tests failed. Exiting."
-  exit 1
-fi
-
 if [ ${?} -eq 0 ]
 then
+  echo "Tests Passed."
   DUMP_LOGS="false"
+else 
+  echo "Some tests failed. Exiting."
+  exit 1
 fi
