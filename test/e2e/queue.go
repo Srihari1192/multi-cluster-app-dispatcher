@@ -84,100 +84,6 @@ var _ = Describe("AppWrapper E2E Test", func() {
 		}
 	}) */
 
-	It("MCAD CPU Accounting Test", func() {
-		fmt.Fprintf(os.Stdout, "[e2e] MCAD CPU Accounting Test - Started.\n")
-
-		context := initTestContext()
-		var appwrappers []*arbv1.AppWrapper
-		appwrappersPtr := &appwrappers
-		defer cleanupTestObjectsPtr(context, appwrappersPtr)
-
-		// This should fill up the worker node and most of the master node
-		aw := createDeploymentAWwith550CPU(context, appendRandomString("aw-deployment-2-550cpu"))
-		appwrappers = append(appwrappers, aw)
-
-		err := waitAWPodsReady(context, aw)
-		Expect(err).NotTo(HaveOccurred(), "Ready pods are expected for app wrapper: aw-deployment-2-550cpu")
-
-		// This should fill up the master node
-		aw2 := createDeploymentAWwith350CPU(context, appendRandomString("aw-deployment-2-350cpu"))
-		appwrappers = append(appwrappers, aw2)
-
-		// Using quite mode due to creating of pods in earlier step.
-		err = waitAWReadyQuiet(context, aw2)
-		Expect(err).NotTo(HaveOccurred(), "Ready pods are expected for app wrapper: aw-deployment-2-350cpu")
-		fmt.Fprintf(os.Stdout, "[e2e] MCAD CPU Accounting Test - Completed. Awaiting app wrapper cleanup...\n")
-	})
-
-	It("MCAD CPU Preemption Test", func() {
-		fmt.Fprintf(os.Stdout, "[e2e] MCAD CPU Preemption Test - Started.\n")
-
-		context := initTestContext()
-		var appwrappers []*arbv1.AppWrapper
-		appwrappersPtr := &appwrappers
-		defer cleanupTestObjectsPtr(context, appwrappersPtr)
-
-		// This should fill up the worker node and most of the master node
-		aw := createDeploymentAWwith550CPU(context, appendRandomString("aw-deployment-2-550cpu"))
-		appwrappers = append(appwrappers, aw)
-		time.Sleep(1 * time.Minute)
-		err := waitAWPodsReady(context, aw)
-		Expect(err).NotTo(HaveOccurred())
-
-		// This should not fit on cluster
-		aw2 := createDeploymentAWwith426CPU(context, appendRandomString("aw-deployment-2-426cpu"))
-		appwrappers = append(appwrappers, aw2)
-		err = waitAWAnyPodsExists(context, aw2)
-		Expect(err).NotTo(HaveOccurred())
-
-		// This should fit on cluster, initially queued because of aw2 above but should eventually
-		// run after prevention of aw2 above.
-		aw3 := createDeploymentAWwith425CPU(context, "aw-deployment-2-425cpu")
-		appwrappers = append(appwrappers, aw3)
-
-		// Since preemption takes some time, increasing timeout wait time to 2 minutes
-		err = waitAWPodsExists(context, aw3, 2*time.Minute)
-		Expect(err).NotTo(HaveOccurred(), "Expecting pods for app wrapper : aw-deployment-2-425cpu")
-	})
-
-	It("MCAD CPU Requeuing - Completion After Enough Requeuing Times Test", func() {
-		fmt.Fprintf(os.Stdout, "[e2e] Completion After Enough Requeuing Times Test - Started.\n")
-
-		context := initTestContext()
-		var appwrappers []*arbv1.AppWrapper
-		appwrappersPtr := &appwrappers
-		defer cleanupTestObjectsPtr(context, appwrappersPtr)
-
-		// Create a job with init containers that need 200 seconds to be ready before the container starts.
-		// The requeuing mechanism is set to start at 1 minute, which is not enough time for the PODs to be completed.
-		// The job should be requeued 3 times before it finishes since the wait time is doubled each time the job is requeued (i.e., initially it waits
-		// for 1 minutes before requeuing, then 2 minutes, and then 4 minutes). Since the init containers take 3 minutes
-		// and 20 seconds to finish, a 4 minute wait should be long enough to finish the job successfully
-		aw := createJobAWWithInitContainer(context, "aw-job-3-init-container", 60, "exponential", 0)
-		appwrappers = append(appwrappers, aw)
-
-		err := waitAWPodsCompleted(context, aw, 12*time.Minute) // This test waits for 12 minutes to make sure all PODs complete
-		Expect(err).NotTo(HaveOccurred(), "Waiting for the pods to be completed")
-	})
-
-	It("MCAD CPU Requeuing - Deletion After Maximum Requeuing Times Test", func() {
-		fmt.Fprintf(os.Stdout, "[e2e] MCAD CPU Requeuing Test - Started.\n")
-
-		context := initTestContext()
-		var appwrappers []*arbv1.AppWrapper
-		appwrappersPtr := &appwrappers
-		defer cleanupTestObjectsPtr(context, appwrappersPtr)
-
-		// Create a job with init containers that need 200 seconds to be ready before the container starts.
-		// The requeuing mechanism is set to fire after 1 second (plus the 60 seconds time interval of the background thread)
-		// Within 5 minutes, the AppWrapper will be requeued up to 3 times at which point it will be deleted
-		aw := createJobAWWithInitContainer(context, "aw-job-3-init-container", 1, "none", 3)
-		appwrappers = append(appwrappers, aw)
-
-		err := waitAWPodsCompleted(context, aw, 300*time.Second)
-		Expect(err).To(HaveOccurred())
-	})
-
 	It("Create AppWrapper - StatefulSet Only - 2 Pods", func() {
 		fmt.Fprintf(os.Stdout, "[e2e] Create AppWrapper - StatefulSet Only - 2 Pods - Started.\n")
 
@@ -790,6 +696,100 @@ var _ = Describe("AppWrapper E2E Test", func() {
 		}
 		Expect(err).Should(Succeed(), "All app wrappers should have completed")
 		fmt.Fprintf(os.Stdout, "[e2e] Generic 50 Deployment Only - 2 pods each - Completed, awaiting app wrapper clean up.\n")
+	})
+
+	It("MCAD CPU Accounting Test", func() {
+		fmt.Fprintf(os.Stdout, "[e2e] MCAD CPU Accounting Test - Started.\n")
+
+		context := initTestContext()
+		var appwrappers []*arbv1.AppWrapper
+		appwrappersPtr := &appwrappers
+		defer cleanupTestObjectsPtr(context, appwrappersPtr)
+
+		// This should fill up the worker node and most of the master node
+		aw := createDeploymentAWwith550CPU(context, appendRandomString("aw-deployment-2-550cpu"))
+		appwrappers = append(appwrappers, aw)
+
+		err := waitAWPodsReady(context, aw)
+		Expect(err).NotTo(HaveOccurred(), "Ready pods are expected for app wrapper: aw-deployment-2-550cpu")
+
+		// This should fill up the master node
+		aw2 := createDeploymentAWwith350CPU(context, appendRandomString("aw-deployment-2-350cpu"))
+		appwrappers = append(appwrappers, aw2)
+
+		// Using quite mode due to creating of pods in earlier step.
+		err = waitAWReadyQuiet(context, aw2)
+		Expect(err).NotTo(HaveOccurred(), "Ready pods are expected for app wrapper: aw-deployment-2-350cpu")
+		fmt.Fprintf(os.Stdout, "[e2e] MCAD CPU Accounting Test - Completed. Awaiting app wrapper cleanup...\n")
+	})
+
+	It("MCAD CPU Preemption Test", func() {
+		fmt.Fprintf(os.Stdout, "[e2e] MCAD CPU Preemption Test - Started.\n")
+
+		context := initTestContext()
+		var appwrappers []*arbv1.AppWrapper
+		appwrappersPtr := &appwrappers
+		defer cleanupTestObjectsPtr(context, appwrappersPtr)
+
+		// This should fill up the worker node and most of the master node
+		aw := createDeploymentAWwith550CPU(context, appendRandomString("aw-deployment-2-550cpu"))
+		appwrappers = append(appwrappers, aw)
+		time.Sleep(1 * time.Minute)
+		err := waitAWPodsReady(context, aw)
+		Expect(err).NotTo(HaveOccurred())
+
+		// This should not fit on cluster
+		aw2 := createDeploymentAWwith426CPU(context, appendRandomString("aw-deployment-2-426cpu"))
+		appwrappers = append(appwrappers, aw2)
+		err = waitAWAnyPodsExists(context, aw2)
+		Expect(err).NotTo(HaveOccurred())
+
+		// This should fit on cluster, initially queued because of aw2 above but should eventually
+		// run after prevention of aw2 above.
+		aw3 := createDeploymentAWwith425CPU(context, "aw-deployment-2-425cpu")
+		appwrappers = append(appwrappers, aw3)
+
+		// Since preemption takes some time, increasing timeout wait time to 2 minutes
+		err = waitAWPodsExists(context, aw3, 2*time.Minute)
+		Expect(err).NotTo(HaveOccurred(), "Expecting pods for app wrapper : aw-deployment-2-425cpu")
+	})
+
+	It("MCAD CPU Requeuing - Completion After Enough Requeuing Times Test", func() {
+		fmt.Fprintf(os.Stdout, "[e2e] Completion After Enough Requeuing Times Test - Started.\n")
+
+		context := initTestContext()
+		var appwrappers []*arbv1.AppWrapper
+		appwrappersPtr := &appwrappers
+		defer cleanupTestObjectsPtr(context, appwrappersPtr)
+
+		// Create a job with init containers that need 200 seconds to be ready before the container starts.
+		// The requeuing mechanism is set to start at 1 minute, which is not enough time for the PODs to be completed.
+		// The job should be requeued 3 times before it finishes since the wait time is doubled each time the job is requeued (i.e., initially it waits
+		// for 1 minutes before requeuing, then 2 minutes, and then 4 minutes). Since the init containers take 3 minutes
+		// and 20 seconds to finish, a 4 minute wait should be long enough to finish the job successfully
+		aw := createJobAWWithInitContainer(context, "aw-job-3-init-container", 60, "exponential", 0)
+		appwrappers = append(appwrappers, aw)
+
+		err := waitAWPodsCompleted(context, aw, 12*time.Minute) // This test waits for 12 minutes to make sure all PODs complete
+		Expect(err).NotTo(HaveOccurred(), "Waiting for the pods to be completed")
+	})
+
+	It("MCAD CPU Requeuing - Deletion After Maximum Requeuing Times Test", func() {
+		fmt.Fprintf(os.Stdout, "[e2e] MCAD CPU Requeuing Test - Started.\n")
+
+		context := initTestContext()
+		var appwrappers []*arbv1.AppWrapper
+		appwrappersPtr := &appwrappers
+		defer cleanupTestObjectsPtr(context, appwrappersPtr)
+
+		// Create a job with init containers that need 200 seconds to be ready before the container starts.
+		// The requeuing mechanism is set to fire after 1 second (plus the 60 seconds time interval of the background thread)
+		// Within 5 minutes, the AppWrapper will be requeued up to 3 times at which point it will be deleted
+		aw := createJobAWWithInitContainer(context, "aw-job-3-init-container", 1, "none", 3)
+		appwrappers = append(appwrappers, aw)
+
+		err := waitAWPodsCompleted(context, aw, 300*time.Second)
+		Expect(err).To(HaveOccurred())
 	})
 
 	/*
