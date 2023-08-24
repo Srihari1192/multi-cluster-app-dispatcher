@@ -467,16 +467,9 @@ setup-mcad-env
 #kuttl-tests
 mcad-up
 
+go test ./test/e2e -v -timeout 130m -count=1
 
-# Run tests interactively and skip remaining tests on failure
-while IFS= read -r test_name; do
-    echo "Running test: $test_name"
-    go test ./test/e2e -run "$test_name" -v -timeout 130m -count=1
-
-    if [ $? -ne 0 ]; then
-        echo "Test $test_name failed. Skipping remaining tests."
-        break
-    fi
-done < <(go test ./test/e2e -list '.*')
-
-echo "All tests executed or skipped."
+if [ $? -ne 0 ]; then
+  echo "Tests failed!"
+  exit 1
+fi

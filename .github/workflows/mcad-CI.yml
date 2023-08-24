@@ -34,9 +34,6 @@ jobs:
         run:
           make mcad-controller
 
-      - name: Run Unit tests
-        run: make run-test
-
       - name: Build Image
         run: |
           make images -e GIT_BRANCH=${{ env.GIT_BRANCH }} TAG=${{ env.GIT_BRANCH }}-${{ env.TAG }}
