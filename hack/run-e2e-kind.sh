@@ -456,6 +456,7 @@ function kuttl-tests {
   rm -f kubeconfig
 }
 
+
 trap cleanup EXIT
 update_test_host
 check-prerequisites 
@@ -463,9 +464,14 @@ kind-up-cluster
 extend-resources
 setup-mcad-env
 # MCAD with quotamanagement options is started by kuttl-tests
-kuttl-tests
+#kuttl-tests
 mcad-up
 go test ./test/e2e -v -timeout 130m -count=1
+if [ $? -ne 0 ]; then
+  echo "Some tests failed. Exiting."
+  exit 1
+fi
+
 if [ ${?} -eq 0 ]
 then
   DUMP_LOGS="false"
