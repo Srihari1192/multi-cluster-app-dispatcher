@@ -466,6 +466,11 @@ setup-mcad-env
 # MCAD with quotamanagement options is started by kuttl-tests
 #kuttl-tests
 mcad-up
+
+# Enable immediate exit on failure
+set -e
+
+# Run Go E2E Tests
 go test ./test/e2e -v -timeout 130m -count=1
 if [ ${?} -eq 0 ]
 then
